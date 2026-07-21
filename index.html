@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>健康チェック</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #2563eb;
+      --primary2: #1d4ed8;
+      --good: #10b981;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 14px 40px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f172a, #334155);
+      color: white;
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    h1 { margin: 0; font-size: clamp(28px, 4vw, 42px); line-height: 1.15; }
+    .sub { margin: 10px 0 0; color: rgba(255,255,255,0.78); line-height: 1.7; max-width: 760px; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    button:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary2); }
+    .btn-ghost { background: #eef2ff; color: #3730a3; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+    .btn-light { background: #f3f4f6; color: #111827; }
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+    @media (max-width: 900px) { .grid-stats { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .grid-stats { grid-template-columns: 1fr; } }
+    .stat {
+      background: var(--card);
+      border: 1px solid rgba(229,231,235,0.9);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .stat .k { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .stat .v { font-size: 26px; font-weight: 800; line-height: 1.1; }
+    .layout {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 18px;
+    }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(229,231,235,0.9);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .card h2 { margin: 0 0 14px; font-size: 18px; }
+    .small { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #374151; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      background: white;
+      outline: none;
+      transition: 0.15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+    .section-gap { margin-top: 16px; }
+    .people-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .chip button {
+      padding: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #374151;
+      line-height: 22px;
+      font-size: 14px;
+    }
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    @media (max-width: 720px) { .checkbox-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .check input { width: 16px; height: 16px; }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+      background: white;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      color: #374151;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    tbody td {
+      border-bottom: 1px solid #f1f5f9;
+      padding: 12px 10px;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    tbody tr:hover { background: #fbfdff; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .ok { background: #dcfce7; color: #166534; }
+    .maybe { background: #fef3c7; color: #92400e; }
+    .bad { background: #fee2e2; color: #991b1b; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .toolbar .filters {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 10px;
+      min-width: min(100%, 560px);
+    }
+    @media (max-width: 720px) { .toolbar .filters { grid-template-columns: 1fr; min-width: 100%; } }
+    .muted-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .empty {
+      padding: 20px 12px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .bottom-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .inline-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="badge">毎日の健康チェック</div>
+          <h1>健康記録</h1>
+          <p class="sub">名前を登録して、プルダウンで選びながら体温・症状・備考を記録できます。データはこの端末に保存されます。</p>
+        </div>
+        <div class="hero-actions">
+          <button type="button" id="exportCsvTop" class="btn-ghost">CSV保存</button>
+          <button type="button" id="resetAllTop" class="btn-danger">全削除</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-stats">
+      <div class="stat"><div class="k">登録人数</div><div class="v" id="statPeople">0</div></div>
+      <div class="stat"><div class="k">今日の記録</div><div class="v" id="statToday">0</div></div>
+      <div class="stat"><div class="k">注意が必要</div><div class="v" id="statAlert">0</div></div>
+      <div class="stat"><div class="k">未入力人数</div><div class="v" id="statMissing">0</div></div>
+    </div>
+
+    <div class="layout">
+      <section class="card">
+        <h2>名前の登録</h2>
+        <div class="row">
+          <div>
+            <label for="newPerson">追加する名前</label>
+            <input id="newPerson" type="text" placeholder="例：田中 太郎" />
+          </div>
+          <div style="display:flex;align-items:end;">
+            <button type="button" id="addPersonBtn" class="btn-primary" style="width:100%;">名前を追加</button>
+          </div>
+        </div>
+        <div class="section-gap">
+          <div class="small" style="margin-bottom:8px;">登録済みの名前</div>
+          <div id="peopleList" class="people-list"></div>
+        </div>
+
+        <div class="section-gap">
+          <h2>入力フォーム</h2>
+          <form id="form" class="form">
+            <div class="row">
+              <div>
+                <label for="person">名前</label>
+                <select id="person"></select>
+              </div>
+              <div>
+                <label for="date">日付</label>
+                <input id="date" type="date" />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label for="temp">体温（℃）</label>
+                <input id="temp" type="number" step="0.1" min="34" max="42" placeholder="例: 36.6" />
+              </div>
+              <div>
+                <label for="note">備考</label>
+                <input id="note" type="text" placeholder="連絡事項があれば入力" />
+              </div>
+            </div>
+            <div>
+              <label>症状</label>
+              <div class="checkbox-grid" id="symptomGrid"></div>
+            </div>
+            <div>
+              <label for="otherSymptom">その他の症状</label>
+              <input id="otherSymptom" type="text" placeholder="自由記述" />
+            </div>
+            <div class="inline-actions">
+              <button type="submit" class="btn-primary">登録する</button>
+              <button type="button" id="clearForm" class="btn-light">クリア</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2>記録一覧</h2>
+            <div class="small">日付とキーワードで絞り込みできます。</div>
+          </div>
+          <div class="filters">
+            <div>
+              <label for="search">検索</label>
+              <input id="search" type="text" placeholder="名前・症状・備考で検索" />
+            </div>
+            <div>
+              <label for="filterDate">日付</label>
+              <input id="filterDate" type="date" />
+            </div>
+          </div>
+        </div>
+
+        <div class="muted-box">
+          <div class="small" style="margin-bottom:8px;">未入力者</div>
+          <div id="missingList" class="people-list"></div>
+        </div>
+
+        <div class="section-gap table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>名前</th>
+                <th>体温</th>
+                <th>症状</th>
+                <th>備考</th>
+                <th>判定</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="bottom-note">
+          1人につき1日1件で上書きされます。必要に応じてCSV保存できます。
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "health-check-html-v2";
+    const DEFAULT_PEOPLE = ["佐藤", "鈴木", "高橋", "田中"];
+    const symptomOptions = ["発熱", "せき", "のどの痛み", "だるさ", "頭痛", "腹痛", "下痢", "吐き気"];
+
+    const els = {
+      exportCsvTop: document.getElementById("exportCsvTop"),
+      resetAllTop: document.getElementById("resetAllTop"),
+      statPeople: document.getElementById("statPeople"),
+      statToday: document.getElementById("statToday"),
+      statAlert: document.getElementById("statAlert"),
+      statMissing: document.getElementById("statMissing"),
+      newPerson: document.getElementById("newPerson"),
+      addPersonBtn: document.getElementById("addPersonBtn"),
+      peopleList: document.getElementById("peopleList"),
+      form: document.getElementById("form"),
+      person: document.getElementById("person"),
+      date: document.getElementById("date"),
+      temp: document.getElementById("temp"),
+      note: document.getElementById("note"),
+      symptomGrid: document.getElementById("symptomGrid"),
+      otherSymptom: document.getElementById("otherSymptom"),
+      clearForm: document.getElementById("clearForm"),
+      search: document.getElementById("search"),
+      filterDate: document.getElementById("filterDate"),
+      missingList: document.getElementById("missingList"),
+      tableBody: document.getElementById("tableBody"),
+    };
+
+    function todayISO() {
+      const d = new Date();
+      const tz = d.getTimezoneOffset() * 60000;
+      return new Date(d - tz).toISOString().slice(0, 10);
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { people: [...DEFAULT_PEOPLE], records: [] };
+        const parsed = JSON.parse(raw);
+        return {
+          people: Array.isArray(parsed.people) && parsed.people.length ? parsed.people : [...DEFAULT_PEOPLE],
+          records: Array.isArray(parsed.records) ? parsed.records : [],
+        };
+      } catch {
+        return { people: [...DEFAULT_PEOPLE], records: [] };
+      }
+    }
+
+    let state = loadState();
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function normalizeTemp(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function symptomText(record) {
+      const joined = [...(record.symptoms || []), record.otherSymptom].filter(Boolean).join("、");
+      return joined || "-";
+    }
+
+    function judge(record) {
+      const temp = normalizeTemp(record.temperature);
+      const hasSymptoms = (record.symptoms?.length || 0) > 0 || !!record.otherSymptom;
+      if ((temp !== null && temp >= 38.0) || (temp !== null && temp >= 37.5 && hasSymptoms)) return { text: "要確認", cls: "bad" };
+      if ((temp !== null && temp >= 37.5) || hasSymptoms) return { text: "注意", cls: "maybe" };
+      return { text: "正常", cls: "ok" };
+    }
+
+    function escapeHTML(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function renderSymptoms() {
+      els.symptomGrid.innerHTML = symptomOptions.map((s) => `
+        <label class="check">
+          <input type="checkbox" data-symptom="${escapeHTML(s)}" />
+          <span>${escapeHTML(s)}</span>
+        </label>
+      `).join("");
+    }
+
+    function getSelectedSymptoms() {
+      return [...els.symptomGrid.querySelectorAll("input[type=checkbox]:checked")].map((n) => n.getAttribute("data-symptom"));
+    }
+
+    function setSelectedSymptoms(list) {
+      const set = new Set(list || []);
+      els.symptomGrid.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+        cb.checked = set.has(cb.getAttribute("data-symptom"));
+      });
+    }
+
+    function renderPersonSelect(selected) {
+      const current = selected || els.person.value || state.people[0] || "";
+      els.person.innerHTML = state.people.length
+        ? state.people.map((p) => `<option value="${escapeHTML(p)}" ${p === current ? "selected" : ""}>${escapeHTML(p)}</option>`).join("")
+        : `<option value="">名前を登録してください</option>`;
+    }
+
+    function renderPeopleList() {
+      els.peopleList.innerHTML = state.people.length
+        ? state.people.map((p) => `
+          <span class="chip">
+            <span>${escapeHTML(p)}</span>
+            <button type="button" data-remove-person="${escapeHTML(p)}">×</button>
+          </span>
+        `).join("")
+        : `<div class="small">まだ名前が登録されていません。</div>`;
+
+      els.peopleList.querySelectorAll("[data-remove-person]").forEach((btn) => {
+        btn.addEventListener("click", () => removePerson(btn.getAttribute("data-remove-person")));
+      });
+    }
+
+    function renderMissingList() {
+      const selectedDate = els.filterDate.value || todayISO();
+      const records = state.records.filter((r) => r.date === selectedDate);
+      const missing = state.people.filter((p) => !records.some((r) => r.person === p));
+      els.missingList.innerHTML = missing.length
+        ? missing.map((p) => `<span class="chip"><span>${escapeHTML(p)}</span></span>`).join("")
+        : `<div class="small">すべて入力済みです。</div>`;
+    }
+
+    function renderStats() {
+      const today = todayISO();
+      const selectedDate = els.filterDate.value || today;
+      const daily = state.records.filter((r) => r.date === selectedDate);
+      const todayRecords = state.records.filter((r) => r.date === today);
+      const alertCount = daily.filter((r) => judge(r).text !== "正常").length;
+      const missing = state.people.filter((p) => !daily.some((r) => r.person === p)).length;
+      els.statPeople.textContent = String(state.people.length);
+      els.statToday.textContent = String(todayRecords.length);
+      els.statAlert.textContent = String(alertCount);
+      els.statMissing.textContent = String(missing);
+    }
+
+    function renderTable() {
+      const query = els.search.value.trim().toLowerCase();
+      const filterDate = els.filterDate.value;
+      const rows = state.records
+        .filter((r) => !filterDate || r.date === filterDate)
+        .filter((r) => {
+          const text = `${r.date} ${r.person} ${r.temperature} ${symptomText(r)} ${r.note}`.toLowerCase();
+          return text.includes(query);
+        })
+        .sort((a, b) => `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`));
+
+      els.tableBody.innerHTML = rows.length ? rows.map((r) => {
+        const j = judge(r);
+        return `
+          <tr>
+            <td>${escapeHTML(r.date)}</td>
+            <td>${escapeHTML(r.person)}</td>
+            <td>${escapeHTML(r.temperature || "-")} ℃</td>
+            <td>${escapeHTML(symptomText(r))}</td>
+            <td>${escapeHTML(r.note || "-")}</td>
+            <td><span class="pill ${j.cls}">${j.text}</span></td>
+            <td><button type="button" class="btn-light" data-delete="${escapeHTML(r.id)}">削除</button></td>
+          </tr>
+        `;
+      }).join("") : `<tr><td colspan="7" class="empty">条件に一致する記録がありません。</td></tr>`;
+
+      els.tableBody.querySelectorAll("[data-delete]").forEach((btn) => {
+        btn.addEventListener("click", () => deleteRecord(btn.getAttribute("data-delete")));
+      });
+    }
+
+    function renderAll() {
+      if (!state.people.length) state.people = [...DEFAULT_PEOPLE];
+      if (!els.date.value) els.date.value = todayISO();
+      if (!els.filterDate.value) els.filterDate.value = todayISO();
+      renderPersonSelect();
+      renderPeopleList();
+      renderMissingList();
+      renderStats();
+      renderTable();
+      saveState();
+    }
+
+    function addPerson() {
+      const name = els.newPerson.value.trim();
+      if (!name) return;
+      if (state.people.includes(name)) {
+        els.newPerson.value = "";
+        return;
+      }
+      state.people.push(name);
+      state.people.sort((a, b) => a.localeCompare(b, "ja"));
+      els.newPerson.value = "";
+      renderPersonSelect(name);
+      renderAll();
+      els.person.value = name;
+    }
+
+    function removePerson(name) {
+      if (!confirm(`${name} を削除しますか？`)) return;
+      state.people = state.people.filter((p) => p !== name);
+      state.records = state.records.filter((r) => r.person !== name);
+      if (!state.people.length) state.people = [...DEFAULT_PEOPLE];
+      if (!state.people.includes(els.person.value)) els.person.value = state.people[0] || "";
+      renderAll();
+    }
+
+    function deleteRecord(id) {
+      state.records = state.records.filter((r) => r.id !== id);
+      renderAll();
+    }
+
+    function resetFormKeepPerson() {
+      els.temp.value = "";
+      els.note.value = "";
+      els.otherSymptom.value = "";
+      setSelectedSymptoms([]);
+      els.date.value = els.date.value || todayISO();
+    }
+
+    function resetAll() {
+      if (!confirm("すべての記録を削除しますか？")) return;
+      state = { people: [...DEFAULT_PEOPLE], records: [] };
+      saveState();
+      els.search.value = "";
+      els.filterDate.value = todayISO();
+      els.newPerson.value = "";
+      els.date.value = todayISO();
+      els.person.value = state.people[0] || "";
+      resetFormKeepPerson();
+      renderAll();
+    }
+
+    function exportCsv() {
+      const rows = state.records.slice().sort((a, b) => `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`));
+      const header = ["日付", "名前", "体温", "症状", "備考", "判定"];
+      const body = rows.map((r) => {
+        const j = judge(r);
+        return [r.date, r.person, r.temperature || "", symptomText(r), r.note || "", j.text];
+      });
+      const csv = [header, ...body]
+        .map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `health-check-${todayISO()}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    els.addPersonBtn.addEventListener("click", addPerson);
+    els.newPerson.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addPerson();
+      }
+    });
+    els.form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const symptoms = getSelectedSymptoms();
+      const record = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        person: els.person.value,
+        date: els.date.value || todayISO(),
+        temperature: els.temp.value.trim(),
+        symptoms,
+        otherSymptom: els.otherSymptom.value.trim(),
+        note: els.note.value.trim(),
+        createdAt: new Date().toISOString(),
+      };
+      if (!record.person) return;
+      state.records = state.records.filter((r) => !(r.person === record.person && r.date === record.date));
+      state.records.unshift(record);
+      saveState();
+      resetFormKeepPerson();
+      renderAll();
+    });
+    els.clearForm.addEventListener("click", () => resetFormKeepPerson());
+    els.search.addEventListener("input", renderTable);
+    els.filterDate.addEventListener("change", () => { renderMissingList(); renderStats(); renderTable(); });
+    els.exportCsvTop.addEventListener("click", exportCsv);
+    els.resetAllTop.addEventListener("click", resetAll);
+
+    renderSymptoms();
+    els.date.value = todayISO();
+    els.filterDate.value = todayISO();
+    els.person.value = state.people[0] || "";
+    renderAll();
+  </script>
+</body>
+</html>
