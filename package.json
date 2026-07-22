@@ -1,0 +1,9 @@
+{
+  "name": "health-check-complete",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Health check app for GitHub and Vercel deployment",
+  "engines": {
+    "node": ">=20"
+  }
+}
